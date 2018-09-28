@@ -1,0 +1,29 @@
+{% load static%}
+<form action="{% url 'patients:detail' patient.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2> 基本信息 </h2>
+    姓名 <input type="text" name="name" value="{{ patient.name }}"/><br>
+    年龄 <input type="number" name="age" value="{{ patient.age }}"/><br>
+    电话 <input type="text" name="phone" value="{{ patient.phone }}"/><br>
+    性别
+    {% if patient.gender == "male" %}
+        <input type="radio" name="gender" value="male" checked/>男 <input type="radio" name="gender" value="female"/>女
+    {% else %}
+        <input type="radio" name="gender" value="male"/>男 <input type="radio" name="gender" value="female" checked/>女
+    {% endif %}
+
+    <h2>治疗信息</h2>
+    {% for treatment in patient.treatment.all %}
+        名称:  <input type="text" name="treatment_name" value="{{ treatment.name }}"/><br>
+        细节: <br> <textarea name="treatment_detail" cols="50" rows="20">{{ treatment.detail }}</textarea> <br>
+        照片: <br>
+        {% for picture in treatment.picture.all %}
+            {{ picture.name }} <br> <img src="{{ picture.path }}" alt="{{ picture.name }}" height="700" width="1000"> <br> <br>
+            {% endfor %}
+            <input type="file" id="test-image-file" multiple="multiple" name="pictures" accept="image/gif, image/jpeg, image/png, image/jpg">
+        <br><br><br>
+    {% endfor %}
+    <!-- <a href="{% url 'patients:treatment' patient.id %}">添加治疗</a> -->
+    <input type="hidden" name="_method" value="submit" />
+    <br> <input type="submit" value="确认"> <input type="reset" value="重置">
+</form>

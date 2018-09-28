@@ -1,0 +1,8 @@
+<form action="{% url 'patients:detail' patient.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+        名称:  <input type="text" name="treatment_name" value="{{ treatment.name }}"/><br>
+        细节: <br> <input type="text" name="treatment_detail" value="{{ treatment.detail }}"/><br>
+        照片: <input type="file" id="test-image-file" multiple="multiple" name="pictures" accept="image/gif, image/jpeg, image/png, image/jpg">
+    <input type="hidden" name="_method" value="submit" />
+    <br> <input type="submit" value="确认"> <input type="reset" value="重置">
+</form>

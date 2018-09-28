@@ -1,9 +1,20 @@
+<form action="{% url 'patients:search' %}" method="get">
+    <input type="text" name="search_value" placeholder="姓名或电话">
+    <input type="submit" value="搜索">
+</form>
+
+<form action="{% url 'patients:index' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="_method" value="create" />
+    <button type="submit">添加病人</button>
+</form>
+
 {% if patients_list %}
     <ul>
     {% for patient in patients_list %}
-        <li><a href="/patients/{{ patient.id }}/">{{ patient.name }}</a></li>
+        <li><a href="{% url 'patients:detail' patient.id %}">{{ patient.name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>No patients in DB.</p>
+    <p>没找到这个病人</p>
 {% endif %}

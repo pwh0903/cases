@@ -1,1 +1,34 @@
-{{ question }}
+<div>
+    <h2>基本信息</h2>
+    姓名: {{ patient.name }}   <br>
+    年龄: {{ patient.age }}    <br>
+    性别: 
+    {% if patient.gender == "male" %}
+    男
+    {% else %}
+    女
+    {% endif %}
+    <br>
+    电话: {{ patient.phone }}  <br><br>
+</div>
+
+
+<h2>治疗信息</h2>
+{% for treatment in patient.treatment.all %}
+    名称: {{ treatment.name }}<br>
+    细节: <br> <textarea cols="50" rows="20">{{ treatment.detail }}</textarea> <br>
+    照片: <br>
+    {% for picture in treatment.picture.all %}
+        {{ picture.name }} <br> <img src="{{ picture.path }}" alt="{{ picture.name }}" height="700" width="1000"> <br> <br>
+    {% endfor %}
+{% endfor %}
+
+<h1>{{ question.question_text }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'patients:detail' patient.id %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="_method" value="update" />
+    <input type="submit" value="编辑">
+</form>

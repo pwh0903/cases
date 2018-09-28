@@ -1,0 +1,12 @@
+<form action="{% url 'patients:index' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2> 基本信息 </h2>
+    姓名 <input type="text" name="name" value="{{ patient.name }}"/><br>
+    年龄 <input type="number" name="age" value="{{ patient.age }}"/><br>
+    电话 <input type="text" name="phone" value="{{ patient.phone }}"/><br>
+    性别 <input type="radio" name="gender" value="male" checked/>男 <input type="radio" name="gender" value="female"/>女
+    <input type="hidden" name="_method" value="submit" />
+    <br> <input type="submit" value="确认"> <input type="reset" value="重置">
+</form>
+<h2>治疗信息</h2>
+<a href="">添加治疗信息</a>
