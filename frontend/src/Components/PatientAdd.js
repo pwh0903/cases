@@ -10,7 +10,6 @@ import TreatmentForm from './TreatmentForm';
 class PatientAdd extends Component {
     constructor() {
         super();
-        this.genderList = ['男', '女'];
         this.treatmentForm = <form>
             <input type="text" name="name"></input> <br></br>
             <textarea></textarea> <br></br>
@@ -20,7 +19,8 @@ class PatientAdd extends Component {
             patient: {
                 name: '',
                 age: '',
-                gender: ''
+                gender: '',
+                phone: '',
             },
             treatments: [
                 {
@@ -63,7 +63,18 @@ class PatientAdd extends Component {
     }
 
     submitPatient(){
-        console.log(this.state);
+        let postUrl = 'http://127.0.0.1:8003/patients/api/patients/';
+        $.post(
+            postUrl,
+            { 
+                data: JSON.stringify(this.state),
+            },
+        ).done(function(){
+            alert('success');
+        })
+        .fail(function(){
+            alert('fail');
+        });
     }
 
     render() {

@@ -21,7 +21,9 @@ class PatientBasic extends Component {
     }
 
     handleChange = name => event => {
-        this.props.updateBasic(name, event.target.value);
+        if(typeof this.props.updateBasic !== 'undefined'){
+            this.props.updateBasic(name, event.target.value);
+        }
     }
 
     render() {
@@ -72,6 +74,18 @@ class PatientBasic extends Component {
                         </MenuItem>
                     ))}
                 </TextField>
+                <br />
+                <TextField
+                    id="outlined-number"
+                    label="电话"
+                    value={this.props.patient.phone}
+                    onChange={this.handleChange('phone')}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    margin="normal"
+                    variant="outlined"
+                />
                 <hr></hr>
             </div>
         );

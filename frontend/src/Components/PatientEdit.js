@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+import uuid from 'uuid';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import { BrowserRouter as Router } from 'react-router-dom';
 
-class PatientEdit extends Component {
+import PatientBasic from './PatientBasic';
+import TreatmentForm from './TreatmentForm';
+
+
+class PatientDetail extends Component {
     constructor() {
         super();
         this.treatmentForm = <form>
@@ -12,74 +15,102 @@ class PatientEdit extends Component {
             <textarea></textarea> <br></br>
             <select></select> <br></br>
         </form>
+        this.genderList = ['男', '女'];
         this.state = {
             patient: {},
-            treatmentList: [this.treatmentForm,],
-            treatmentData: [
-                {
-                    treamtmentName: '',
-                    treamtmentDetail: '',
-                    pictures: [],
-                },
-            ]
+            treatments: []
         }
     }
 
     getPatient(id){
         $.ajax({
-          url: 'http://127.0.0.1:8000/patients/api/patients/' + id,
+          url: 'http://127.0.0.1:8003/patients/api/patients/' + id,
           dataType: 'json',
           cache: false,
           success: function(data){
-            console.log(data);
-            this.setState({patient: data});
+            this.setState({patient: data.patient, treatments: data.treatments});
           }.bind(this),
           error: function(xhr, status, err){
             console.log(err);
           }
         });
+      }
+
+    updateBasic(name, basicData){
+        let tmp = this.state.patient;
+        tmp[name] = basicData;
+        this.setState({patient: tmp});
+    }
+
+    updateTreatment(name, treatmentData, treatmentID){
+        let tmp = this.state.treatments;
+        tmp.map(treatment => {
+            if(treatment.id === treatmentID){
+                treatment[name] = treatmentData;
+            }
+        });
+        this.setState({treatments: tmp});
+    }
+
+    submitPatient(){
+        let postUrl = 'http://127.0.0.1:8003/patients/api/patients/';
+        $.post(
+            postUrl,
+            { 
+                data: JSON.stringify(this.state),
+            },
+        ).done(function(){
+            alert('success');
+        })
+        .fail(function(){
+            alert('fail');
+        });
     }
 
     addTreatment(){
-        let tmp = this.state.treatmentList;
-        tmp.push(this.treatmentForm);
-        this.setState({treatmentList: tmp});
-        console.log(this.state.treatmentData);
+        let tmp = this.state.treatments;
+        tmp.push(
+            {
+                id: uuid.v4(),
+                name: '',
+                detail: '',
+                pictures: [],
+            },
+        );
+        this.setState({treatments: tmp});
     }
-
-    handleChange = name => event => {
-        let tmp = this.state.patient
-        tmp.name = event.target.value;
-        this.setState({
-            patient: tmp,
-        });
-    };
-
+    
     componentDidMount(){
         this.getPatient(this.props.match.params.id);
+    }
+
+    backToIndex(){
+
     }
 
     render() {
         return (
             <div>
-                <TextField
-                    id="outlined-name"
-                    label="Name"
-                    // className={classes.textField}
-                    value={this.state.patient.name}
-                    onChange={this.handleChange('name')}
-                    margin="normal"
-                    variant="outlined"
-                />
-                <ul>
-                    {this.state.treatmentList.map((i) => <li key={this.state.treatmentList.indexOf(i)}>{i}</li>)}
-                </ul>
-                <Button variant="contained" color="secondary" onClick={this.addTreatment.bind(this)}> 
-                    add
+                <PatientBasic patient={this.state.patient} updateBasic={this.updateBasic.bind(this)}/>
+                <br/>
+                {this.state.treatments.map((treatment) => 
+                    <TreatmentForm
+                        key={treatment.id}
+                        treatment={treatment}
+                        updateTreatment={this.updateTreatment.bind(this)}
+                    />
+                )}
+                <Button variant="contained" color="primary" onClick={this.addTreatment.bind(this)}> 
+                    添加治疗信息
+                </Button>
+                <hr />
+                <br />
+                <Button variant="contained" color="secondary" onClick={this.submitPatient.bind(this)}> 
+                    提交
                 </Button>
             </div>
         );
     }
 }
 
-export default PatientEdit;
+export default PatientDetail;

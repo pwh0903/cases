@@ -18,39 +18,45 @@ class TreatmentForm extends Component {
     }
     
     onFileChange(e){
-        let tmp = e.target.files;
-        Object.keys(tmp).forEach(key => {
-            let newPic = tmp[key];
-            let reader = new FileReader();
-            reader.onload = e => {
-                let tmpPictures = this.state.pictures;
-                let src = e.target.result;
-                let image = new Image();
-                image.src = src;
-                tmpPictures.push({
-                    id: uuid.v4(),
-                    name: newPic.name,
-                    data: reader.result
-                });
-                this.props.updateTreatment('pictures', tmpPictures, this.props.treatment.id);
-            };
-            reader.readAsDataURL(newPic);
-        });
+        if(typeof this.props.updateTreatment !== 'undefined'){
+            let tmp = e.target.files;
+            Object.keys(tmp).forEach(key => {
+                let newPic = tmp[key];
+                let reader = new FileReader();
+                reader.onload = e => {
+                    let tmpPictures = this.state.pictures;
+                    let src = e.target.result;
+                    let image = new Image();
+                    image.src = src;
+                    tmpPictures.push({
+                        id: uuid.v4(),
+                        name: newPic.name,
+                        data: reader.result
+                    });
+                    this.props.updateTreatment('pictures', tmpPictures, this.props.treatment.id);
+                };
+                reader.readAsDataURL(newPic);
+            });
+        }
     }
 
     deletePicture(picName) {
-        let tmp = this.state.pictures;
-        tmp.map(pic => {
-            if (pic.name === picName){
-                tmp.splice(tmp.indexOf(pic), 1);
-            }
-        });
-        this.setState({pictures: tmp});
-        this.props.updateTreatment('pictures',tmp, this.props.treatment.id);
+        if(typeof this.props.updateTreatment !== 'undefined'){
+            let tmp = this.state.pictures;
+            tmp.map(pic => {
+                if (pic.name === picName){
+                    tmp.splice(tmp.indexOf(pic), 1);
+                }
+            });
+            this.setState({pictures: tmp});
+            this.props.updateTreatment('pictures',tmp, this.props.treatment.id);
+        }
     }
 
     handleTreatmentChange = name => event => {
-        this.props.updateTreatment(name, event.target.value, this.props.treatment.id);
+        if(typeof this.props.updateTreatment !== 'undefined'){
+            this.props.updateTreatment(name, event.target.value, this.props.treatment.id);
+        }
     }
 
     render() {
@@ -85,11 +91,12 @@ class TreatmentForm extends Component {
                 />
                 {this.props.treatment.pictures.map((pic) =>
                     <div key={pic.id}>
-                        <Tooltip title="Delete">
+                        <Tooltip title="删除">
                             <IconButton aria-label="Delete">
                             <DeleteIcon onClick={this.deletePicture.bind(this, pic.name)}/>
                             </IconButton>
-                        </Tooltip> <br />
+                        </Tooltip>
+                        <br />
                         <img src={pic.data} height="500" width="700" alt={pic.name}/>
                     </div>
                 )}

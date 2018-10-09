@@ -1,23 +1,27 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
-import { Button } from '@material-ui/core';
+import Button from '@material-ui/core/Button'
+
+import PatientBasic from './PatientBasic';
+import TreatmentForm from './TreatmentForm';
 
 
 class PatientDetail extends Component {
     constructor() {
         super();
         this.state = {
-            patient: [],
+            patient: {},
+            treatments: []
         }
     }
 
     getPatient(id){
         $.ajax({
-          url: 'http://127.0.0.1:8000/patients/api/patients/' + id,
+          url: 'http://127.0.0.1:8003/patients/api/patients/' + id,
           dataType: 'json',
           cache: false,
           success: function(data){
-            this.setState({patient: data});
+            this.setState({patient: data.patient, treatments: data.treatments});
           }.bind(this),
           error: function(xhr, status, err){
             console.log(err);
@@ -29,16 +33,27 @@ class PatientDetail extends Component {
         this.getPatient(this.props.match.params.id);
     }
 
-    deletePatient(id){
-        this.props.onDelete(id);
+    backToIndex(){
+
     }
 
     render() {
+        console.log(this.state);
         return (
             <div>
-            <li className="Patient">
-                {this.state.patient.name} - {this.state.patient.age}
-            </li>
+                <PatientBasic patient={this.state.patient}/>
+                <br/>
+                {this.state.treatments.map((treatment) => 
+                    <TreatmentForm
+                        key={treatment.id}
+                        treatment={treatment}
+                    />
+                )}
+                <hr />
+                <br />
+                <Button variant="contained" color="secondary" onClick={this.backToIndex.bind(this)}> 
+                    返回
+                </Button>
             </div>
         );
     }
