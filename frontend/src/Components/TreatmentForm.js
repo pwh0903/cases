@@ -47,6 +47,7 @@ class TreatmentForm extends Component {
                 if (pic.name === picName){
                     tmp.splice(tmp.indexOf(pic), 1);
                 }
+                return true;
             });
             this.setState({pictures: tmp});
             this.props.updateTreatment('pictures',tmp, this.props.treatment.id);

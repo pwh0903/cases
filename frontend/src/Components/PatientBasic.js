@@ -23,6 +23,8 @@ class PatientBasic extends Component {
     handleChange = name => event => {
         if(typeof this.props.updateBasic !== 'undefined'){
             this.props.updateBasic(name, event.target.value);
+        }else{
+            return true;
         }
     }
 
@@ -40,6 +42,7 @@ class PatientBasic extends Component {
                     margin="normal"
                     variant="outlined"
                 />
+                &nbsp;
                 <TextField
                     id="outlined-number"
                     label="年龄"
@@ -52,6 +55,7 @@ class PatientBasic extends Component {
                     margin="normal"
                     variant="outlined"
                 />
+                &nbsp;
                 <TextField
                     id="outlined-select-currency"
                     select
@@ -68,11 +72,11 @@ class PatientBasic extends Component {
                     margin="normal"
                     variant="outlined"
                 >
-                    {this.state.genderList.map(option => (
-                        <MenuItem key={option.key} value={option.key}>
-                        {option.value}
-                        </MenuItem>
-                    ))}
+                {this.state.genderList.map(option => (
+                    <MenuItem key={option.key} value={option.key}>
+                    {option.value}
+                    </MenuItem>
+                ))}
                 </TextField>
                 <br />
                 <TextField

@@ -48,22 +48,24 @@ class PatientDetail extends Component {
             if(treatment.id === treatmentID){
                 treatment[name] = treatmentData;
             }
+            return true;
         });
         this.setState({treatments: tmp});
     }
 
-    submitPatient(){
-        let postUrl = 'http://127.0.0.1:8003/patients/api/patients/';
-        $.post(
-            postUrl,
-            { 
-                data: JSON.stringify(this.state),
-            },
-        ).done(function(){
-            alert('success');
+    submitPatient(id){
+        let putUrl = 'http://127.0.0.1:8003/patients/api/patients/' + id + '/';
+        $.ajax({
+            url: putUrl,
+            type: 'PUT',
+            data: JSON.stringify(this.state),
+        }).done(function(){
+            alert('提交成功');
+            window.location.href = '/';
         })
         .fail(function(){
-            alert('fail');
+            alert('提交失败 请联系管理员');
+            window.location.href = '/';
         });
     }
 
@@ -84,8 +86,11 @@ class PatientDetail extends Component {
         this.getPatient(this.props.match.params.id);
     }
 
-    backToIndex(){
-
+    cancelEditPatient(){
+        let r = window.confirm("确认取消吗?");
+        if(r === true){
+            window.location.href = '/';
+        }
     }
 
     render() {
@@ -105,8 +110,12 @@ class PatientDetail extends Component {
                 </Button>
                 <hr />
                 <br />
-                <Button variant="contained" color="secondary" onClick={this.submitPatient.bind(this)}> 
+                <Button variant="contained" color="primary" onClick={this.submitPatient.bind(this, this.state.patient.id)}> 
                     提交
+                </Button>
+                &nbsp;
+                <Button variant="contained" color="secondary" onClick={this.cancelEditPatient.bind(this)}> 
+                    取消
                 </Button>
             </div>
         );

@@ -33,12 +33,11 @@ class PatientDetail extends Component {
         this.getPatient(this.props.match.params.id);
     }
 
-    backToIndex(){
-
+    backToList(){
+        window.location.href = '/';
     }
 
     render() {
-        console.log(this.state);
         return (
             <div>
                 <PatientBasic patient={this.state.patient}/>
@@ -51,7 +50,7 @@ class PatientDetail extends Component {
                 )}
                 <hr />
                 <br />
-                <Button variant="contained" color="secondary" onClick={this.backToIndex.bind(this)}> 
+                <Button variant="contained" color="secondary" onClick={this.backToList.bind(this)}> 
                     返回
                 </Button>
             </div>
