@@ -81,6 +81,19 @@ class PatientDetail extends Component {
         );
         this.setState({treatments: tmp});
     }
+
+    deleteTreatment = treatmentID => {
+        let tmp = this.state.treatments;
+        let removeIndex = -1;
+        tmp.map(treatment =>{
+            if(treatment.id === treatmentID){
+                removeIndex = tmp.indexOf(treatment);
+            }
+            return true;
+        })
+        tmp.splice(removeIndex, 1);
+        this.setState({treatments: tmp});
+    }
     
     componentDidMount(){
         this.getPatient(this.props.match.params.id);
@@ -94,6 +107,9 @@ class PatientDetail extends Component {
     }
 
     render() {
+        if(typeof localStorage.token === 'undefined'){
+            window.location.href = '/login';
+        }
         return (
             <div>
                 <PatientBasic patient={this.state.patient} updateBasic={this.updateBasic.bind(this)}/>
@@ -103,6 +119,7 @@ class PatientDetail extends Component {
                         key={treatment.id}
                         treatment={treatment}
                         updateTreatment={this.updateTreatment.bind(this)}
+                        deleteTreatment={this.deleteTreatment.bind(this)}
                     />
                 )}
                 <Button variant="contained" color="primary" onClick={this.addTreatment.bind(this)}> 

@@ -37,6 +37,9 @@ class PatientsList extends Component {
     getPatients(url){
         $.ajax({
             url: url,
+            headers:{
+                'Authorization':'JWT ' + localStorage.token
+            },
             dataType: 'json',
             cache: false,
             success: function(data){
@@ -64,6 +67,9 @@ class PatientsList extends Component {
         if(r === true){
             let deleteUrl = 'http://127.0.0.1:8003/patients/api/patients/' + id + '/';
             $.ajax({
+                headers:{
+                    'Authorization':'JWT ' + localStorage.token
+                },
                 url: deleteUrl,
                 type: 'DELETE',
             }).done(function(){
@@ -74,10 +80,6 @@ class PatientsList extends Component {
                 alert('删除失败 请联系管理员');
             });
         };
-    };
-
-    handleChangePage = (event, page) => {
-        this.setState({ page });
     };
     
     handleChangeRowsPerPage = event => {
@@ -122,8 +124,16 @@ class PatientsList extends Component {
         tmp[prop] = event.target.value;
         this.setState({searchValue: tmp});
     };
+    
+    logout(){
+        localStorage.removeItem('token');
+        window.location.href = '/';
+    }
 
     render() {
+        if(typeof localStorage.token === 'undefined'){
+            window.location.href = '/login';
+        }
         return (
             <div>
                 <TextField
@@ -149,33 +159,39 @@ class PatientsList extends Component {
                 <Button variant="contained" color="primary" component={Link} to={"/add"}> 
                     添加患者
                 </Button>
+                &nbsp;
+                <Button variant="contained" color="primary" onClick={this.logout}> 
+                    退出登录
+                </Button>
                 <Table >
                     <TableHead>
                         <TableRow>
-                        <TableCell>姓名</TableCell>
-                        <TableCell>电话</TableCell>
-                        <TableCell>性别</TableCell>
-                        <TableCell numeric>年龄</TableCell>
+                            <TableCell>姓名</TableCell>
+                            <TableCell>电话</TableCell>
+                            <TableCell>性别</TableCell>
+                            <TableCell numeric>年龄</TableCell>
+                            <TableCell>操作</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {this.state.patients.map(patient => {
                             return (
                                 <TableRow key={patient.id}>
-                                    <TableCell>{patient.name}
-                                        <Button variant="contained" component={Link} to={"/detail/" + patient.id} >
-                                            详情
-                                        </Button>
-                                        <Button variant="contained" color="primary" component={Link} to={"/edit/" + patient.id}>
-                                            修改
-                                        </Button>
-                                        <Button variant="contained" color="secondary" onClick={this.deletePatient.bind(this, patient.id)}> 
-                                            删除
-                                        </Button>
-                                    </TableCell>
+                                    <TableCell>{patient.name}</TableCell>
                                     <TableCell>{patient.phone}</TableCell>
                                     <TableCell>{this.state.genderList[patient.gender]}</TableCell>
                                     <TableCell numeric>{patient.age}</TableCell>
+                                    <TableCell>
+                                        <Button variant="contained" component={Link} to={"/detail/" + patient.id} size="small">
+                                            详情
+                                        </Button>
+                                        <Button variant="contained" color="primary" component={Link} to={"/edit/" + patient.id} size="small">
+                                            修改
+                                        </Button>
+                                        <Button variant="contained" color="secondary" onClick={this.deletePatient.bind(this, patient.id)} size="small"> 
+                                            删除
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             );
                         })}

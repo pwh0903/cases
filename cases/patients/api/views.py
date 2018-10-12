@@ -11,7 +11,7 @@ class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
 
     def get_queryset(self):
-        queryset = Patient.objects.all()
+        queryset = Patient.objects.all().exclude(status=0)
         name = self.request.query_params.get('name')
         if name is not None and name.strip() != '':
             queryset = queryset.filter(name__contains=name)
@@ -27,6 +27,7 @@ class PatientViewSet(viewsets.ModelViewSet):
             try:
                 data = json.loads(data)
             except Exception as e:
+                print(e)
                 pass
             patient = data.get('patient')
             patient_name = patient.get('name').strip()
@@ -46,15 +47,30 @@ class PatientViewSet(viewsets.ModelViewSet):
                 t = Treatment()
                 t.name = treatment.get('name').strip()
                 t.detail = treatment.get('detail')
-                t.owner = p
+                t.patient = p
                 t.save()
                 for picture in pictures:
-                    p = Picture()
-                    p.owner = t
-                    p.name = picture.get('name').strip()
-                    p.data = picture.get('data')
-                    p.save()
+                    pic = Picture()
+                    pic.treatment = t
+                    pic.name = picture.get('name').strip()
+                    pic.data = picture.get('data')
+                    pic.save()
             return HttpResponse(status=201)
+        except Exception as e:
+            return HttpResponse(status=500)
+
+    def destroy(self, request, pk=None):
+        try:
+            patient = Patient.objects.get(pk=pk)
+            patient.status = 0
+            patient.save()
+            for treatment in patient.treatment.all():
+                treatment.status = 0
+                for pictures in treatment.picture.all():
+                    picture.status = 0
+                    picture.save()
+                treatment.save()
+            return HttpResponse(status=200)
         except Exception as e:
             return HttpResponse(status=500)
 
@@ -72,7 +88,7 @@ class PatientViewSet(viewsets.ModelViewSet):
                 'phone': patient.phone
             }
             result_data['treatments'] = list()
-            treatments = patient.treatment.all()
+            treatments = patient.treatment.all().exclude(status=0)
             for treatment in treatments:
                 t = {
                     'id': treatment.id,
@@ -82,7 +98,7 @@ class PatientViewSet(viewsets.ModelViewSet):
                     'end_time': treatment.end_time,
                     'pictures': list()
                 }
-                pics = treatment.picture.all()
+                pics = treatment.picture.all().exclude(status=0)
                 for pic in pics:
                     p = {
                         'id': pic.id,
@@ -110,26 +126,37 @@ class PatientViewSet(viewsets.ModelViewSet):
             p.phone = patient_data.get('phone')
             p.save()
 
+            # check if treatment be removed
+            new_treatment_ids = [str(t.get('id')) for t in treatments]
+            for t in p.treatment.all():
+                if str(t.id) not in new_treatment_ids:
+                    t.status = 0
+                    t.save()
+
             # update treatment info
             for treatment in treatments:
                 pictures = treatment.get('pictures')
                 try:
+                    # treatment already exists
                     t = Treatment.objects.get(pk=treatment.get('id'))
                     t.name = treatment.get('name').strip()
                     t.detail = treatment.get('detail')
                     t.save()
                     # delete all old pics
-                    [i.delete() for i in t.picture.all()]
+                    for i in t.picture.all():
+                        t.status = 0
+                        t.save()
                 except Exception as e:
+                    # new treatment
                     t = Treatment()
                     t.name = treatment.get('name').strip()
                     t.detail = treatment.get('detail')
-                    t.owner = p
+                    t.patient = p
                     t.save()
                 # create new pics
                 for picture in pictures:
                     pic = Picture()
-                    pic.owner = t
+                    pic.treatment = t
                     pic.name = picture.get('name').strip()
                     pic.data = picture.get('data')
                     pic.save()
@@ -139,10 +166,10 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 
 class PictureViewSet(viewsets.ModelViewSet):
-    queryset = Picture.objects.all()
+    queryset = Picture.objects.all().exclude(status=0)
     serializer_class = PictureSerializer
 
 
 class TreatmentViewSet(viewsets.ModelViewSet):
-    queryset = Treatment.objects.all()
+    queryset = Treatment.objects.all().exclude(status=0)
     serializer_class = TreatmentSerializer

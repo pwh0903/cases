@@ -18,6 +18,9 @@ class PatientDetail extends Component {
     getPatient(id){
         $.ajax({
           url: 'http://127.0.0.1:8003/patients/api/patients/' + id,
+          headers:{
+            'Authorization':'JWT ' + localStorage.token
+            },
           dataType: 'json',
           cache: false,
           success: function(data){
@@ -38,6 +41,9 @@ class PatientDetail extends Component {
     }
 
     render() {
+        if(typeof localStorage.token === 'undefined'){
+            window.location.href = '/login';
+        }
         return (
             <div>
                 <PatientBasic patient={this.state.patient}/>

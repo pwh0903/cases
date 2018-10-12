@@ -60,6 +60,12 @@ class TreatmentForm extends Component {
         }
     }
 
+    deleteTreatment = () => {
+        if(typeof this.props.deleteTreatment !== 'undefined'){
+            this.props.deleteTreatment(this.props.treatment.id);
+        }
+    }
+
     render() {
         return (
             <div>
@@ -114,6 +120,10 @@ class TreatmentForm extends Component {
                         上传照片
                     </Button>
                 </label>
+                <br/> <br/>
+                <Button variant="contained" color="secondary" onClick={this.deleteTreatment.bind(this)}> 
+                    删除治疗信息
+                </Button>
                 <br/> <br/>
                 <hr></hr>
             </div>
